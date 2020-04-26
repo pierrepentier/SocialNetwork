@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme formCommentary 'bootstrap_4_layout.html.twig' %}
+
+{% block title %} Comment the publication {% endblock %}
+
+{% block body %}
+        <div class="container-fluid vh-100 p-2" style="background-color:#7eb8da">
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <div class="row justify-content-end mx-auto"><p class="mr-3">Logged in as {{ app.user.username }}<p> <a class="btn btn-outline-secondary my-auto" href="{{ path('app_logout') }}">Logout</a></div>
+    {% endif %}
+
+        <div class="container">
+            <form method="post">
+                <div class="row">
+                    <div class="col-lg-8 offset-lg-2 bg-dark p-4 rounded-lg">
+                        <div class="row">
+                            <div class="col-lg-8 offset-lg-2 text-white">
+                                <h1 class="mb-3 font-weight-normal text-center">Comment your friend's publication</h1>
+                                
+                                {{ form_row(formCommentary.comment) }}
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-4 justify-content-center mt-3 ">
+                                        <a href="{{ path("home_page") }}" class="btn btn-primary w-100">Back</a>
+                                    </div>                                
+                                    <div class="col-lg-4 offset-lg-2 justify-content-center mt-3 ">
+                                        {{ form_row(formCommentary.publish) }}
+                                        {{ form_end(formCommentary) }}                                       
+                                    </div>                                
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>       
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

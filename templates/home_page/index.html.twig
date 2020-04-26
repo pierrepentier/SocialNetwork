@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Friendup{% endblock %}
+
+{% block body %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/c24fee648d.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <div class="container-fluid py-2" style="background-color:#7eb8da">
+        
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div class="row justify-content-end mx-auto"><p class="mr-3">Logged in as {{ app.user.username }}<p> <a class="btn btn-danger my-auto" href="{{ path('app_logout') }}">Logout</a></div>
+        {% endif %}
+        <div class="row justify-content-center mb-1"><h1><strong>Friendup<strong></h1></div>
+        <div class="row justify-content-center mb-5"><p class="font-italic">Making friends has never been so easy !</p></div>
+        <div class="row">
+            <div class="col-lg-3">
+            {% if myNotifications %}
+                <div class="alert alert-warning text-dark" role="alert">
+                    <a class="text-decoration-none" href="{{ path('remove_notifs') }}">
+                        <i class="fas fa-bell"></i><span class="font-italic text-danger"><strong> {{myNotifications|length}} </strong></span></a><span>notification(s)</span>
+                    <a data-toggle="collapse" href="#notificationCollapse" role="button" aria-expanded="false" aria-controls="notificationCollapse"><i class="fas fa-sort-down"></i></a>                   
+                </div>
+            {% else %}
+                <div class="alert alert-warning text-dark" role="alert">
+                <a class=" text-decoration-none" href="{{ path('remove_notifs') }}">
+                    <i class="far fa-bell"></i><span class="font-italic text-secondary"><strong> 0 </strong></span></a><span>notification</span>
+                    <a data-toggle="collapse" href="#notificationCollapse" role="button" aria-expanded="false" aria-controls="notificationCollapse"><i class="fas fa-sort-down"></i></a>
+                </div>
+            {% endif %}
+            
+                <div class="col-lg-12 alert alert-warning collapse text-dark" id="notificationCollapse">
+                    {% for mynotification in myNotificationsHistory %}
+                        <p>1 {{ mynotification.notification.type }} from <span class="font-italic text-primary">{{ mynotification.notification.user.username }}</span></br><small class="font-italic text-secondary">{{ mynotification.notification.date|date() }}</small></p>
+                    {% endfor %} 
+                </div>                
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-12 rounded mb-2">
+                        {{ form_start(formPublication) }}
+                        <div class="row">
+                            <div class="col-lg-11 p-0">
+                                {{ form_row(formPublication.message) }}
+                            </div>
+                            <div class="col-lg-1 p-0 text-right">
+                                {{ form_row(formPublication.publish) }}
+                            </div>
+                            {{ form_end(formPublication) }}
+                        </div>
+                    </div>
+                </div>
+            {% for publication in publications %}
+                <div class="row rounded mb-2 p-4 bg-light border border-secondary">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <h5 class="text-primary font-italic"><strong>{{publication.user.username}}</strong></h5>
+                        </div>
+                        <div class="row">
+                            <p class="text-secondary font-italic"><small>{{publication.date|date()}}</small></p>
+                        </div>
+                        <div class="row rounded justify-content-center" style="background-color:#92ddea">
+                            <div class="col-lg-12">
+                                <p class="text-break">{{publication.message}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                        {% set liked = false %}
+                            <a class="mr-5 js-like" href="{{ path('like_publication',{'id_publication' : publication.id}) }}">
+                            {% for like in publication.likes %}
+                                {% if app.user == like.user %}
+                                    {% set liked = true %}
+                                    <i class="fas fa-thumbs-up"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% if liked == false %}
+                                <i class="far fa-thumbs-up"></i>
+                            {% endif %}
+                            <span class="js-likes"><small>{{publication.likes|length}} </small></span>
+                            <span><small>like</small></span>
+                            </a>
+                            <a class="ml-auto" data-toggle="collapse" href="#commentary_collapse{{publication.id}}" role="button" aria-expanded="false" aria-controls="commentary_collapse"><small>{{publication.commentaries|length}} Comment(s)</small></a>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+
+                            <a href="{{ path('create_commentary',{'id_user' : app.user.id, 'id_publication' : publication.id}) }}"><i class="far fa-comment"> Comment the publication</i><a>
+                        </div>
+                        <div class="row collapse" id="commentary_collapse{{publication.id}}">
+                            {% for commentary in publication.commentaries %}
+                                <div class="col-lg-12 rounded mb-2 p-2" style="background-color:#dbdfd9">
+                                    <div class="row mx-auto">
+                                        <p class="text-primary font-italic"><small>{{commentary.user.username}}</small></p><p class="ml-3"><small>{{commentary.date|date()}}</small></p>
+                                    </div>
+                                    <div class="row mx-auto">
+                                        <td>{{commentary.comment}}</td>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script>
+        function onClickBtnLike(e){
+            e.preventDefault();
+            const url = this.href;
+            const spanCount = this.querySelector('span.js-likes');
+            const icone = this.querySelector('i');
+            axios.get(url).then(function(response) {
+                spanCount.textContent = response.data.likes;
+                if (icone.classList.contains('fas'))
+                    icone.classList.replace('fas', 'far')
+                else
+                    icone.classList.replace('far', 'fas')
+            });
+        }
+        document.querySelectorAll('a.js-like').forEach(function(link){
+            link.addEventListener('click', onClickBtnLike);
+        })
+        </script>
+{% endblock %}

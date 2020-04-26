@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme formPublication 'bootstrap_4_layout.html.twig' %}
+
+{% block title %} Create your publication {% endblock %}
+
+{% block body %}
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <div class="row justify-content-end mx-auto"><p class="mr-3">Logged in as {{ app.user.username }}<p> <a class="btn btn-outline-secondary my-auto" href="{{ path('app_logout') }}">Logout</a></div>
+    {% endif %}
+
+    <h1>Create your publication</h1>
+    {{ form_start(formPublication) }}
+        {{ form_widget(formPublication) }}
+    {{ form_end(formPublication) }}
+
+{% endblock %}
